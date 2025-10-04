@@ -213,9 +213,34 @@
         /* Menu Showcase Section */
         .menu-showcase-section {
             padding: 0 0 80px 0;
-            background-color: black;
+            background-color: rgb(0, 0, 0);
             padding: 20px;
         }
+
+        /* Tablet (max 1024px) */
+@media screen and (max-width: 1024px) {
+    .menu-showcase-section {
+        padding: 15px;
+        background-color: rgb(0, 0, 0); /* warna sedikit lebih gelap misalnya */
+    }
+}
+
+/* HP besar (max 768px) */
+@media screen and (max-width: 768px) {
+    .menu-showcase-section {
+        padding: 12px;
+        text-align: center; /* biasanya di hp lebih enak rata tengah */
+    }
+}
+
+/* HP kecil (max 480px) */
+@media screen and (max-width: 480px) {
+    .menu-showcase-section {
+        padding: 10px;
+        background-color: rgb(0, 0, 0); /* lebih redup biar nyaman */
+        font-size: 14px; /* kecilin font supaya muat */
+    }
+}
 
         .menu-grid {
     display: grid;
