@@ -1,417 +1,356 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JooMax Coffee - Kopi Terbaik</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-    
-    <style>
-        /* ========================================================================= */
-        /* --- CSS STYLING --- */
-        /* ========================================================================= */
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Dialog Senja — Coffee Street</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;1,400&display=swap" rel="stylesheet" />
+<style>
+@property --glow{syntax:'<color>';inherits:true;initial-value:#4a2a18}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:#0b0706;color:#f3ebe4;font-family:Jost,system-ui,sans-serif;font-weight:300;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:50;opacity:.05;background:repeating-linear-gradient(0deg,#fff 0 1px,transparent 1px 3px)}
+a{color:inherit;text-decoration:none}
+button{background:none;border:0;color:inherit;font:inherit;cursor:pointer}
+:focus-visible{outline:1px solid #d9b574;outline-offset:4px}
+@media (pointer:fine){body,a,button{cursor:none}}
 
-        /* RESET DASAR & FONT IMPOR */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+/* cursor + preview */
+.cursor{position:fixed;top:-7px;left:-7px;width:14px;height:14px;border-radius:50%;background:#fff;mix-blend-mode:difference;pointer-events:none;z-index:200;transition:scale .35s cubic-bezier(.2,.8,.2,1)}
+.cursor.hov{scale:3.5}
+.preview{position:fixed;top:-110px;left:40px;width:200px;height:220px;z-index:40;pointer-events:none;opacity:0;scale:.8;border-radius:14px;overflow:hidden;transition:opacity .3s,scale .4s cubic-bezier(.2,.8,.2,1)}
+.preview.show{opacity:1;scale:1}
+.preview img{width:100%;height:100%;object-fit:cover}
+@media (pointer:coarse){.cursor,.preview{display:none}}
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            color: #333;
-            line-height: 1.6;
-            background-color: #f7f7f7;
-            padding-top: 60px; /* Jarak untuk header fixed */
-        }
+/* loader */
+.loader{position:fixed;inset:0;z-index:100;background:#0b0706;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;transition:transform 1s cubic-bezier(.87,0,.13,1)}
+.loader.done{transform:translateY(-100%)}
+.logo{font-family:'Playfair Display',serif;font-size:1.55rem}
+.count{font-size:.8rem;letter-spacing:.2em;color:#8c7d72;font-variant-numeric:tabular-nums}
 
-        h1, h2, h3 {
-            font-family: 'Playfair Display', serif;
-            font-weight: 700;
-        }
+/* nav */
+.nav{position:fixed;top:0;left:0;right:0;z-index:60;display:flex;justify-content:space-between;align-items:center;padding:34px 5.5vw}
+.nav nav{display:flex;gap:3.2vw;font-size:.78rem;color:#cfc3ba}
+.nav nav a{transition:color .3s}
+.nav nav a.on,.nav nav a:hover{color:#fff;font-weight:500}
 
-        .container {
-            width: 90%;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+/* intro states */
+.intro{transition:opacity .9s ease var(--d,0s),transform .9s cubic-bezier(.16,1,.3,1) var(--d,0s)}
+body:not(.ready) .intro{opacity:0;transform:translateY(20px)}
+.t-line{display:block;transition:transform 1.2s cubic-bezier(.16,1,.3,1) calc(var(--i)*.1s)}
+body:not(.ready) .t-line{transform:translateY(110%)}
+.cup{transition:transform 1.6s cubic-bezier(.16,1,.3,1),opacity 1.2s}
+body:not(.ready) .cup{transform:translateY(220px) scale(.9);opacity:0}
+.ghost span{transition:opacity 1.8s ease,transform 1.8s cubic-bezier(.16,1,.3,1)}
+body:not(.ready) .ghost span{opacity:0;transform:translateX(6%)}
+.pop{transition:transform 1.2s cubic-bezier(.34,1.56,.64,1) var(--d,0s)}
+body:not(.ready) .pop{transform:scale(0)}
 
-        /* --- UTILITY CLASSES & COLORS --- */
-        .highlight {
-            color: #795548; /* Warna cokelat yang kaya */
-        }
+/* hero */
+.hero{position:relative;height:100svh;min-height:640px;overflow:hidden;background:radial-gradient(55% 75% at 50% 60%,var(--glow),transparent 72%),#0b0706;transition:--glow 1.2s ease}
+.ghost{position:absolute;left:-3vw;top:13%;white-space:nowrap;pointer-events:none;font-family:'Playfair Display',serif;font-size:20vw;line-height:1}
+.ghost span{display:inline-block;color:rgba(255,255,255,.06)}
+.bean{position:absolute;z-index:3;pointer-events:none}
+.b{display:block;animation:float var(--dur) ease-in-out var(--dl) infinite alternate;filter:blur(var(--bl)) drop-shadow(0 12px 14px rgba(0,0,0,.55))}
+@keyframes float{from{transform:translateY(-14px) rotate(calc(var(--r) - 18deg))}to{transform:translateY(14px) rotate(calc(var(--r) + 18deg))}}
 
-        /* Button Styling */
-        .btn {
-            display: inline-block;
-            padding: 10px 25px;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: 600;
-            transition: background-color 0.3s, color 0.3s;
-            text-transform: uppercase;
-            font-size: 0.9em;
-            margin-top: 15px;
-        }
+.cup-wrap{position:absolute;z-index:2;left:50%;bottom:-7vh;width:min(30vw,46vh);translate:-50% 0}
+.cup{width:100%;height:auto;display:block;-webkit-mask-image:radial-gradient(ellipse 62% 64% at 50% 46%,#000 55%,transparent 100%);mask-image:radial-gradient(ellipse 62% 64% at 50% 46%,#000 55%,transparent 100%)}
 
-        .btn-primary {
-            background-color: #5cb85c; /* Hijau cerah untuk CTA utama */
-            color: white;
-        }
+.left{position:absolute;z-index:4;left:5.5vw;top:42%;width:27vw}
+h1{font-family:'Playfair Display',serif;font-weight:400;font-size:clamp(1.7rem,2.65vw,3.2rem);line-height:1.12}
+.mask{display:block;overflow:hidden;padding-bottom:.12em;margin-bottom:-.12em}
+.left p{margin:1.6vw 0 2.4vw;font-size:.74rem;line-height:1.7;color:#d4c8be;max-width:24vw}
+.btn{display:inline-flex;padding:1.1em 3.6em;font-size:.82rem;border:1px solid rgba(255,255,255,.35);border-radius:999px;transition:background .4s,color .4s,border-color .4s}
+.btn:hover{background:#f3ebe4;color:#0b0706;border-color:#f3ebe4}
 
-        .btn-primary:hover {
-            background-color: #4cae4c;
-        }
+.right{position:absolute;z-index:4;left:65.5vw;top:44%;width:26vw}
+.right h2{font-family:'Playfair Display',serif;font-style:italic;font-weight:400;font-size:clamp(1.2rem,1.75vw,2.1rem)}
+.right p{margin-top:.9vw;font-size:.7rem;line-height:1.7;color:#a99d94;max-width:17vw}
+.thumbs{display:flex;gap:.5vw;margin-top:3.4vw}
+.thumb{width:6.8vw;max-width:90px;aspect-ratio:50/68;border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,.18);background:#1a110d;padding:3px;transition:border-color .4s,transform .4s,background .4s}
+.thumb img{width:100%;height:100%;object-fit:cover;border-radius:9px;opacity:.7;transition:opacity .4s;display:block}
+.thumb:hover{transform:translateY(-4px)}
+.thumb.on{border-color:#d9b574;background:#2a1c12}
+.thumb.on img,.thumb:hover img{opacity:1}
+.social{position:absolute;z-index:4;right:5.5vw;bottom:8%;display:flex;gap:1.6vw;color:#cfc3ba}
+.social svg{width:18px;height:18px;display:block}
+.social a:hover{color:#fff}
 
-        .btn-secondary {
-            background-color: transparent;
-            border: 2px solid #5cb85c;
-            color: #5cb85c;
-            padding: 8px 25px;
-        }
+/* menu + contact */
+.menu{padding:18vh 5.5vw 14vh}
+.menu h2,.contact h2{font-family:'Playfair Display',serif;font-weight:400;font-size:clamp(2.2rem,5vw,5rem);line-height:1.05}
+.menu h2{margin-bottom:8vh}
+.row{display:grid;grid-template-columns:1.1fr 1.4fr auto;gap:3vw;align-items:baseline;padding:3.4vh 0;border-top:1px solid rgba(255,255,255,.14);transition:opacity .4s,padding .4s,transform 1s cubic-bezier(.16,1,.3,1),filter 1s}
+.row:last-child{border-bottom:1px solid rgba(255,255,255,.14)}
+.rv.hide{opacity:0;transform:translateY(40px)}
+.about,.gallery,.lokasi{padding:0 5.5vw 16vh}
+.about{display:grid;grid-template-columns:1fr 1.1fr;gap:6vw;align-items:start}
+.about h2,.gallery h2,.lokasi h2{font-family:'Playfair Display',serif;font-weight:400;font-size:clamp(2.2rem,5vw,5rem);line-height:1.05}
+.about .big{font-family:'Playfair Display',serif;font-size:clamp(1.3rem,2.1vw,2.3rem);line-height:1.4;margin-bottom:5vh}
+.about p{font-size:.88rem;line-height:1.85;color:#b9ada3;max-width:52ch;margin-bottom:2.4vh}
+.about dl{margin-top:6vh;display:grid;grid-template-columns:auto 1fr;gap:1.4vh 3vw;font-size:.85rem;padding-top:3vh;border-top:1px solid rgba(255,255,255,.14)}
+.about dt{color:#8c7d72}.about dd{color:#e6dcd3}
+.gallery h2{margin-bottom:7vh}
+.gal{display:grid;grid-template-columns:repeat(12,1fr);gap:1.4vw;align-items:start}
+.g{overflow:hidden;border-radius:14px;background:#1a110d;aspect-ratio:var(--ar,4/5);grid-column:var(--c);margin-top:var(--mt,0)}
+.g img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 1.2s cubic-bezier(.16,1,.3,1),filter .6s;filter:saturate(.9) brightness(.9)}
+.g:hover img{transform:scale(1.07);filter:none}
+.lokasi h2{margin-bottom:2.4vh}
+.lokasi p{font-size:.88rem;line-height:1.8;color:#b9ada3;margin-bottom:5vh}
+.lokasi p a{color:#d9b574;border-bottom:1px solid rgba(217,181,116,.4)}
+.map{border-radius:16px;overflow:hidden;height:min(60vh,520px);background:#1a110d}
+.map iframe{width:100%;height:100%;border:0;display:block;filter:grayscale(1) invert(.92) contrast(.85) brightness(.9) sepia(.25)}
+.menu:has(.row:hover) .row:not(:hover){opacity:.3}
+.row:hover{padding-left:1.2vw}
+.row .n{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,3.4vw,3.4rem)}
+.row .d{font-size:.8rem;color:#a99d94;line-height:1.7;max-width:34ch}
+.contact{padding:8vh 5.5vw 6vh;display:grid;gap:3vh;border-top:1px solid rgba(255,255,255,.1)}
+.contact p,.contact a{font-size:.85rem;color:#cfc3ba;line-height:1.7}
+.contact small{color:#6f645c;font-size:.7rem}
 
-        .btn-secondary:hover {
-            background-color: #5cb85c;
-            color: white;
-        }
-
-        .btn-tertiary {
-            background-color: #795548; /* Cokelat untuk kartu */
-            color: white;
-        }
-
-        .btn-tertiary:hover {
-            background-color: #5d4037;
-        }
-
-        /* 1. HEADER/NAVBAR */
-        .main-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 50px;
-            background-color: rgba(255, 255, 255, 0.98);
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .logo {
-            font-size: 1.5em;
-            font-weight: 700;
-            color: #333;
-        }
-
-        .main-nav ul {
-            list-style: none;
-            display: flex;
-        }
-
-        .main-nav ul li a {
-            text-decoration: none;
-            color: #333;
-            padding: 10px 15px;
-            font-size: 0.85em;
-            font-weight: 600;
-            transition: color 0.3s;
-            text-transform: uppercase;
-        }
-
-        .main-nav ul li a:hover,
-        .main-nav ul li .active {
-            color: #5cb85c;
-        }
-
-        /* 2. HERO SECTION */
-        .hero-section {
-            /* Ganti URL di bawah ini dengan path gambar biji kopi Anda */
-            background-image: url('https://i.ibb.co/6PqjXfW/coffee-beans.jpg'); 
-            background-size: cover;
-            background-position: center;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            position: relative;
-        }
-
-        .hero-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.45); /* Overlay hitam transparan */
-        }
-
-        .hero-content {
-            position: relative;
-            color: white;
-            z-index: 10;
-        }
-
-        .hero-icon {
-            font-size: 3em;
-            color: #5cb85c;
-            background-color: white;
-            border-radius: 5px;
-            padding: 5px 15px;
-            display: inline-block;
-            margin-bottom: 10px;
-        }
-
-        .hero-content h1 {
-            font-size: 3.5em;
-            margin-bottom: 25px;
-            line-height: 1.2;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-        }
-
-        /* 3. PRODUCT INTRODUCTION SECTION */
-        .product-intro-section {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 40px;
-            padding: 80px 0;
-        }
-
-        .intro-text {
-            flex: 1;
-        }
-
-        .product-images {
-            flex: 1;
-            /* Placeholder untuk meniru gambar produk di sebelah kanan */
-            min-height: 350px;
-            background-image: url('https://i.ibb.co/Rz3hK0v/product-placeholder.png'); 
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-        }
-
-        .intro-text h2 {
-            font-size: 2.2em;
-            color: #444;
-            margin-bottom: 20px;
-            line-height: 1.3;
-        }
-
-        /* 4. JOURNEY / STORY SECTION */
-        .journey-section {
-            display: flex;
-            position: relative;
-            margin-top: 50px;
-            margin-bottom: 100px;
-            height: 400px;
-        }
-
-        .journey-image {
-            flex: 1.5;
-            /* Placeholder untuk meniru gambar daun & biji kopi */
-            background-image: url('https://i.ibb.co/3sX8h2M/coffee-beans-leaf.jpg'); 
-            background-size: cover;
-            background-position: center;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        .journey-card {
-            position: absolute;
-            right: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 50%;
-            background-color: #4e342e; /* Cokelat gelap */
-            color: white;
-            padding: 40px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-        }
-
-        .journey-card h3 {
-            font-size: 1.8em;
-            margin-bottom: 15px;
-        }
-
-        /* 5. PASSION / COFFEE CUP SECTION */
-        .passion-section {
-            display: flex;
-            gap: 0;
-            padding: 50px 0;
-            margin-top: 50px;
-        }
-
-        .passion-card {
-            flex: 1;
-            background-color: white;
-            padding: 50px 40px;
-            border: 1px solid #f0f0f0;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        }
-
-        .passion-card h3 {
-            font-size: 1.8em;
-            margin-bottom: 15px;
-            color: #5d4037;
-        }
-
-        .cup-image {
-            flex: 1;
-            /* Placeholder untuk meniru gambar cangkir kopi */
-            background-image: url('https://i.ibb.co/y547y32/coffee-cup.png'); 
-            background-size: cover;
-            background-position: center;
-        }
-
-        /* 6. FINAL CTA SECTION */
-        .cta-section {
-            text-align: center;
-            padding-top: 80px;
-            background-color: white;
-            margin-top: 50px;
-        }
-
-        .cta-content {
-            margin-bottom: 50px;
-        }
-
-        .cta-content .subtitle {
-            font-size: 1.1em;
-            color: #777;
-            margin-bottom: 5px;
-        }
-
-        .cta-content h2 {
-            font-size: 3em;
-            color: #333;
-            margin-bottom: 15px;
-        }
-
-        .cta-content .sub-subtitle {
-            font-weight: 600;
-            color: #5cb85c;
-            margin-bottom: 30px;
-        }
-
-        .bottom-beans-image {
-            width: 100%;
-            height: 400px;
-            /* Placeholder untuk meniru gambar biji kopi di bagian bawah */
-            background-image: url('https://i.ibb.co/L8y2QG1/bottom-beans.jpg'); 
-            background-size: cover;
-            background-position: center;
-        }
-
-        /* --- RESPONSIVENESS SEDERHANA --- */
-        @media (max-width: 768px) {
-            body { padding-top: 80px; }
-            .main-header {
-                flex-direction: column;
-                padding: 10px 20px;
-            }
-            .main-nav ul {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-            .main-nav ul li a {
-                padding: 5px 10px;
-            }
-
-            .hero-content h1 {
-                font-size: 2em;
-            }
-
-            .product-intro-section,
-            .journey-section,
-            .passion-section {
-                flex-direction: column;
-                height: auto;
-            }
-
-            .product-images, .cup-image, .journey-image {
-                min-height: 250px;
-                width: 100%;
-            }
-
-            .journey-card {
-                position: relative;
-                width: 90%;
-                margin: -50px auto 0; /* Memberi sedikit overlap di atas gambar */
-                transform: none;
-                top: auto;
-                padding: 30px;
-            }
-        }
-    </style>
+@media (max-width:900px){
+  .nav{padding:22px 6vw}.nav nav{gap:18px;font-size:.7rem}.logo{font-size:1.2rem}
+  .hero{height:auto;min-height:100svh;display:flex;flex-direction:column;padding:110px 6vw 40px;gap:28px}
+  .ghost{font-size:30vw;top:12%}
+  .left,.right,.cup-wrap,.social{position:relative;left:auto;top:auto;right:auto;bottom:auto;width:100%}
+  .cup-wrap{order:-1;width:62vw;translate:0;margin:0 auto -10vw}
+  .left p,.right p{max-width:none;font-size:.8rem}
+  h1{font-size:2.1rem}.right h2{font-size:1.5rem}
+  .thumbs{margin-top:24px;gap:10px}.thumb{width:20vw;max-width:none}
+  .row{grid-template-columns:1fr auto}.row .d{display:none}
+  .about{grid-template-columns:1fr;gap:5vh}
+  .gal{grid-template-columns:repeat(2,1fr)}.g{grid-column:auto!important;margin-top:0!important}
+}
+@media (prefers-reduced-motion:reduce){.loader{display:none}.b{animation:none}}
+</style>
 </head>
 <body>
 
-    <header class="main-header">
-        <div class="logo">JOOMAX</div>
-        <nav class="main-nav">
-            <ul>
-                <li><a href="#" class="active">HOME</a></li>
-                <li><a href="#">PAGES</a></li>
-                <li><a href="#">PORTFOLIO</a></li>
-                <li><a href="#">GALLERY</a></li>
-                <li><a href="#">ABOUT</a></li>
-                <li><a href="#">BLOG</a></li>
-                <li><a href="#">MEDIA</a></li>
-            </ul>
-        </nav>
-    </header>
+<!-- definisi biji kopi (dipakai ulang) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <radialGradient id="bg" cx="35%" cy="28%" r="80%"><stop offset="0" stop-color="#8a5a3a"/><stop offset=".45" stop-color="#4a2a17"/><stop offset="1" stop-color="#1c0e07"/></radialGradient>
+    <symbol id="bean" viewBox="0 0 60 84">
+      <ellipse cx="30" cy="42" rx="27" ry="39" fill="url(#bg)"/>
+      <path d="M30 4C14 26 46 54 30 80" fill="none" stroke="#120804" stroke-width="3.5" stroke-linecap="round"/>
+      <ellipse cx="20" cy="22" rx="6" ry="12" fill="#fff" opacity=".1" transform="rotate(18 20 22)"/>
+    </symbol>
+  </defs>
+</svg>
 
-    <section class="hero-section">
-        <div class="hero-content">
-            <div class="hero-icon">M</div>
-            <h1>Welcome to JooMax Coffee! <br> Let's turn your idea into a <span class="highlight">roasted coffee</span>!</h1>
-            <a href="#" class="btn btn-primary">EXPLORE</a>
-        </div>
-    </section>
+<div class="cursor"></div>
+<div class="preview"><img alt="" /></div>
+<div class="loader"><span class="logo">Dialog Senja</span><span class="count">0</span></div>
 
-    <section class="product-intro-section container">
-        <div class="intro-text">
-            <h2>Sed id sollicitudin libero. <br>Suspendisse ut purus varius <br>ex tincidunt, **vehicula tellus.**</h2>
-            <p>Mauris eget sem pharetra, vitae tellus eu, aliquet nisl. Vivamus non risus vitae tellus sollicitudin.</p>
-            <a href="#" class="btn btn-secondary">Our Products</a>
-        </div>
-        <div class="product-images">
-            </div>
-    </section>
+<header class="nav intro">
+  <a class="logo" href="#home">Dialog Senja</a>
+  <nav>
+    <a class="on" href="#home">Home</a>
+    <a href="#menu">Menu</a>
+    <a href="#about">About</a>
+    <a href="#tempat">Tempat</a>
+    <a href="#contact">Contact</a>
+  </nav>
+</header>
 
-    <section class="journey-section container">
-        <div class="journey-image">
-            </div>
-        <div class="journey-card">
-            <h3>Our Journey With Coffee</h3>
-            <p>Donec id tellus sed massa lobortis. Quisque in semper risus. Ut nec urna nec augue sodales euismod nec in libero. Pellentesque in ipsum vitae tellus.</p>
-            <a href="#" class="btn btn-tertiary">Our Story</a>
-        </div>
-    </section>
+<main>
+  <section class="hero" id="home">
+    <div class="ghost"><span></span></div>
+    <div id="beans"></div>
+    <div class="cup-wrap"><img class="cup" alt="" /></div>
 
-    <section class="passion-section container">
-        <div class="passion-card">
-            <h3>Coffee Is A Passion</h3>
-            <p>Mauris eget sem pharetra, vitae tellus eu, aliquet nisl. Fusce sed luctus sapien. Phasellus non libero a justo laoreet pulvinar.</p>
-            <a href="#" class="btn btn-tertiary">Read More</a>
-        </div>
-        <div class="cup-image">
-            </div>
-    </section>
+    <div class="left">
+      <h1></h1>
+      <p class="fade intro" style="--d:.5s"></p>
+      <div class="intro" style="--d:.6s"><a class="btn" href="https://kofee-lime.vercel.app/">Order Now</a></div>
+    </div>
 
-    <section class="cta-section">
-        <div class="cta-content container">
-            <p class="subtitle">The Day Starts With</p>
-            <h2>Our Best Coffee</h2>
-            <p class="sub-subtitle">Delicious Varieties Coffee</p>
-            <a href="#" class="btn btn-primary">Coffee Shop</a>
-        </div>
-        <div class="bottom-beans-image"></div>
-    </section>
+    <div class="right">
+      <h2 class="fade intro" style="--d:.5s"></h2>
+      <p class="fade intro" style="--d:.55s"></p>
+      <div class="thumbs intro" style="--d:.7s"></div>
+    </div>
 
+    <div class="social intro" style="--d:.8s">
+      <a href="https://www.instagram.com/dialogsenjacoffee/" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r=".6" fill="currentColor"/></svg></a>
+      <a href="https://www.tiktok.com/" aria-label="TikTok"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 3c.3 2.2 1.6 3.6 3.8 3.8v2.6c-1.4 0-2.7-.4-3.8-1.2v6.2a5.4 5.4 0 1 1-5.4-5.4c.3 0 .6 0 .9.1v2.7a2.7 2.7 0 1 0 1.8 2.6V3H16z"/></svg></a>
+    </div>
+  </section>
+
+  <section class="menu" id="menu"><h2>Menu</h2></section>
+
+  <section class="about" id="about">
+    <h2 class="rv hide">Tentang<br>Dialog Senja</h2>
+    <div>
+      <p class="big rv hide">Kopi hangat, suasana nyaman, dan cerita senja yang tak terlupakan.</p>
+      <p class="rv hide">Dialog Senja Coffee Street adalah tempat ngopi di Teluk Tering, Batam, yang kami buka untuk berbincang pelan di sore hari. Setiap cangkir diseduh dari biji kopi pilihan barista kami, dari espresso yang tegas sampai latte yang lembut.</p>
+      <p class="rv hide">Kami mulai opening pada 19 Oktober 2025 dengan kopi gratis untuk pelanggan pada pukul 18.00 sampai selesai. Kami tunggu kehadiran Anda.</p>
+      <dl class="rv hide">
+        <dt>Alamat</dt><dd>Jl. Putri Malu, Tlk. Tering, Kota Batam</dd>
+        <dt>Opening</dt><dd>19 Oktober 2025</dd>
+        <dt>Instagram</dt><dd><a href="https://www.instagram.com/dialogsenjacoffee/">@dialogsenjacoffee</a></dd>
+      </dl>
+    </div>
+  </section>
+
+  <section class="gallery" id="tempat">
+    <h2 class="rv hide">Suasana Tempat</h2>
+    <div class="gal">
+      <figure class="g rv hide" style="--c:span 5;--ar:4/5"><img src="gambar2.jpeg" alt="Suasana Dialog Senja" loading="lazy"></figure>
+      <figure class="g rv hide" style="--c:span 4;--ar:1/1;--mt:9vh"><img src="gambar3.jpeg" alt="Biji kopi pilihan" loading="lazy"></figure>
+      <figure class="g rv hide" style="--c:span 3;--ar:3/4;--mt:3vh"><img src="gambar4.jpeg" alt="Menikmati kopi" loading="lazy"></figure>
+      <figure class="g rv hide" style="--c:span 3;--ar:3/4"><img src="gambar5.jpeg" alt="Barista menyeduh kopi" loading="lazy"></figure>
+      <figure class="g rv hide" style="--c:span 5;--ar:4/3;--mt:6vh"><img src="gambar7.jpeg" alt="Interior kafe" loading="lazy"></figure>
+      <figure class="g rv hide" style="--c:span 4;--ar:4/5"><img src="gambar8.jpeg" alt="Dialog Senja" loading="lazy"></figure>
+    </div>
+  </section>
+
+  <section class="lokasi" id="lokasi">
+    <h2 class="rv hide">Lokasi</h2>
+    <p class="rv hide">Jl. Putri Malu, Tlk. Tering, Kota Batam, Kepulauan Riau.
+      <a href="https://www.google.com/maps/search/?api=1&query=Dialog+senja+coffee+Batam">Buka di Google Maps</a></p>
+    <div class="map rv hide">
+      <iframe title="Lokasi Dialog Senja Coffee" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade"
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.0393505546035!2d104.04302247477715!3d1.1322137988569585!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31d989004d7d6337%3A0xd2328cb423638af7!2sDialog%20senja%20coffee!5e0!3m2!1sid!2sid!4v1760791488358!5m2!1sid!2sid"></iframe>
+    </div>
+  </section>
+
+  <footer class="contact" id="contact">
+    <h2>Dialog Senja<br>Coffee Street</h2>
+    <p>Jl. Putri Malu, Tlk. Tering,<br>Kota Batam, Kepulauan Riau</p>
+    <a href="https://www.instagram.com/dialogsenjacoffee/">@dialogsenjacoffee</a>
+    <small>© 2025 Dialog Senja Coffee Street</small>
+  </footer>
+</main>
+
+<script>
+/* ===== DATA — ganti teks, harga, gambar di sini ===== */
+const ORDER = 'https://kofee-lime.vercel.app/';
+const items = [
+  {name:'Coffelate', price:'22k', img:'coffelate.jpeg', glow:'#4a2a18', ghost:'Iced Coffelate Espresso',
+   title:['Iced Coffelate','& Double Espresso'], tag:'Slow Brewed, Served Cold',
+   desc:'Dua shot espresso rumah dituang di atas susu segar dan es bening, lembut, seimbang, dan manis karamel.',
+   sub:'Bahan small-batch di atas es bening. Segar, halus, dibuat saat dipesan.'},
+  {name:'Coppucino', price:'23k', img:'coppucino.jpeg', glow:'#3d2a1f', ghost:'Hot Coppucino Velvet',
+   title:['Hot Coppucino','& Velvet Foam'], tag:'Steamed Slow, Served Warm',
+   desc:'Espresso berpadu susu steamed dan buih lembut di atasnya, hangat dan penuh aroma.',
+   sub:'Susu di-steam perlahan sampai berbuih halus. Hangat di setiap tegukan.'},
+  {name:'Ammericano', price:'15k', img:'ammericano.jpeg', glow:'#1f3326', ghost:'Iced Americano Crema',
+   title:['Iced Americano','& Bold Crema'], tag:'Pure Black, Served Clear',
+   desc:'Kopi hitam klasik dengan aroma kuat dan rasa yang bersih, tanpa tambahan apa pun.',
+   sub:'Espresso murni di atas air dingin dan es. Tegas, bersih, menyegarkan.'},
+  {name:'Dialog Coffee', price:'—', img:'gambar6.jpeg', glow:'#4a2b14', ghost:'Dialog Coffee Signature',
+   title:['Dialog Coffee','& Signature Blend'], tag:'Brewed At Dusk, Served Warm',
+   desc:'Diseduh dari biji premium pilihan barista kami, untuk kehangatan di setiap tegukan.',
+   sub:'Racikan khas Dialog Senja. Nikmati bersama senja di Teluk Tering.'}
+];
+const beanData = [ // x, y, ukuran, rotasi, blur, kedalaman
+  ['-1%','14%',74,-25,0,1.1],['34%','10%',24,40,1,.5],['47%','28%',34,100,0,.8],['62%','3%',30,-30,0,.6],
+  ['91%','4%',60,35,0,1],['17%','90%',56,10,3,1.4],['80%','60%',22,-60,2,.4]];
+
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const hero=$('.hero'), cup=$('.cup'), cupWrap=$('.cup-wrap'), ghost=$('.ghost'), ghostSpan=$('.ghost span');
+let active = 0, busy = false;
+
+/* ===== render ===== */
+$('#beans').innerHTML = beanData.map(([x,y,s,r,bl,d],i)=>
+  `<div class="bean" data-d="${d}" style="left:${x};top:${y}"><div class="pop" style="--d:${1+i*.08}s"><svg class="b" width="${s}" viewBox="0 0 60 84" style="--r:${r}deg;--bl:${bl}px;--dur:${2.5+i*.4}s;--dl:-${i*.7}s"><use href="#bean"/></svg></div></div>`).join('');
+const beans = $$('.bean');
+
+$('.thumbs').innerHTML = items.map((it,i)=>`<button class="thumb" data-i="${i}" aria-label="${it.name}"><img src="${it.img}" alt=""></button>`).join('');
+
+$('.menu').insertAdjacentHTML('beforeend', items.slice(0,3).map((it,i)=>
+  `<a class="row rv hide" href="${ORDER}" data-i="${i}"><span class="n">${it.name}</span><span class="d">${it.desc}</span><span>${it.price}</span></a>`).join(''));
+
+function setContent(i){
+  const it = items[i]; active = i;
+  $('h1').innerHTML = it.title.map((l,k)=>`<span class="mask"><span class="t-line" style="--i:${k}">${l}</span></span>`).join('');
+  $('.left p').textContent = it.desc;
+  $('.right h2').textContent = it.tag;
+  $('.right p').textContent = it.sub;
+  cup.src = it.img; cup.alt = it.name;
+  ghostSpan.textContent = it.ghost;
+  $$('.thumb').forEach((t,k)=>t.classList.toggle('on',k===i));
+}
+setContent(0); hero.style.setProperty('--glow', items[0].glow);
+
+/* ===== ganti produk ===== */
+async function select(i){
+  if(busy || i===active) return; busy = true;
+  const dir = i>active ? 1 : -1;
+  const o = {fill:'forwards'};
+  const outs = [
+    ...$$('.t-line').map((e,k)=>e.animate({transform:['translateY(0)','translateY(-110%)']},{...o,duration:450,delay:k*40,easing:'cubic-bezier(.5,0,.75,0)'})),
+    ...$$('.fade').map(e=>e.animate({opacity:[1,0]},{...o,duration:300})),
+    cup.animate({transform:['none',`translateY(-40px) rotate(${-4*dir}deg) scale(.95)`],opacity:[1,0]},{...o,duration:500,easing:'cubic-bezier(.5,0,.75,0)'}),
+    ghostSpan.animate({transform:['none',`translateX(${-8*dir}%)`],opacity:[1,0]},{...o,duration:500})
+  ];
+  hero.style.setProperty('--glow', items[i].glow);
+  await Promise.all(outs.map(a=>a.finished));
+  outs.forEach(a=>a.cancel());
+  setContent(i);
+  const e = 'cubic-bezier(.16,1,.3,1)';
+  $$('.t-line').forEach((el,k)=>el.animate({transform:['translateY(110%)','none']},{duration:900,delay:k*60,easing:e,fill:'backwards'}));
+  $$('.fade').forEach((el,k)=>el.animate({opacity:[0,1],transform:['translateY(16px)','none']},{duration:600,delay:100+k*50,fill:'backwards'}));
+  cup.animate({transform:[`translateY(80px) rotate(${4*dir}deg) scale(.94)`,'none'],opacity:[0,1]},{duration:1100,easing:e,fill:'backwards'});
+  ghostSpan.animate({transform:[`translateX(${8*dir}%)`,'none'],opacity:[0,1]},{duration:1200,easing:e,fill:'backwards'})
+    .finished.then(()=>busy=false);
+}
+$('.thumbs').addEventListener('click', e=>{const b=e.target.closest('.thumb'); if(b) select(+b.dataset.i)});
+
+/* ===== magnetic button ===== */
+const btn = $('.btn');
+btn.addEventListener('mousemove', e=>{const r=btn.getBoundingClientRect();
+  btn.style.transition='none';
+  btn.style.transform=`translate(${(e.clientX-r.left-r.width/2)*.35}px,${(e.clientY-r.top-r.height/2)*.35}px)`});
+btn.addEventListener('mouseleave', ()=>{
+  btn.animate({transform:[btn.style.transform,'none']},{duration:800,easing:'cubic-bezier(.34,1.56,.64,1)'});
+  btn.style.transform='';btn.style.transition=''});
+
+/* ===== cursor, preview, parallax ===== */
+const cursor=$('.cursor'), preview=$('.preview'), pimg=$('.preview img');
+let tx=0,ty=0,mx=0,my=0,cx=0,cy=0,px=0,py=0,mouseX=0,mouseY=0;
+addEventListener('mousemove', e=>{tx=e.clientX/innerWidth-.5; ty=e.clientY/innerHeight-.5; mouseX=e.clientX; mouseY=e.clientY});
+document.addEventListener('mouseover', e=>cursor.classList.toggle('hov', !!e.target.closest('a,button')));
+$$('.row').forEach(r=>{
+  r.addEventListener('mouseenter',()=>{pimg.src=items[+r.dataset.i].img; preview.classList.add('show')});
+  r.addEventListener('mouseleave',()=>preview.classList.remove('show'));
+});
+(function loop(){
+  mx+=(tx-mx)*.06; my+=(ty-my)*.06;
+  cx+=(mouseX-cx)*.25; cy+=(mouseY-cy)*.25; px+=(mouseX-px)*.12; py+=(mouseY-py)*.12;
+  const sy = scrollY;
+  cursor.style.transform=`translate3d(${cx}px,${cy}px,0)`;
+  preview.style.transform=`translate3d(${px}px,${py}px,0)`;
+  if(sy < innerHeight*1.5){
+    beans.forEach(b=>{const d=+b.dataset.d; b.style.transform=`translate3d(${-mx*90*d}px,${-my*60*d-sy*.3*d}px,0)`});
+    cupWrap.style.transform=`translate3d(${-mx*34}px,${-my*22-sy*.14}px,0) rotate(${mx*3}deg)`;
+    ghost.style.transform=`translate3d(${-mx*140-sy*.25}px,0,0)`;
+  }
+  requestAnimationFrame(loop);
+})();
+
+/* ===== reveal menu saat scroll ===== */
+const io = new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting){const k=[...e.target.parentElement.children].filter(c=>c.classList.contains('rv')).indexOf(e.target);
+    setTimeout(()=>e.target.classList.remove('hide'),k*120); io.unobserve(e.target)}
+}),{threshold:.15});
+$$('.rv').forEach(r=>io.observe(r));
+
+/* ===== preloader ===== */
+const count=$('.count'), t0=performance.now(), D=1600;
+(function tick(now){
+  const t=Math.min((now-t0)/D,1), v=t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+  count.textContent=Math.round(v*100);
+  if(t<1) return requestAnimationFrame(tick);
+  $('.loader').classList.add('done');
+  setTimeout(()=>document.body.classList.add('ready'),450);
+})(t0);
+</script>
 </body>
 </html>
